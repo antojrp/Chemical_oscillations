@@ -5,6 +5,6 @@ using namespace std;
 
 int main()
 {
-    cout << "Quiero a mi novio AJRP <3";
+    cout << "Hello World";
     return 0;
 }
