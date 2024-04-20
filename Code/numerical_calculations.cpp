@@ -4,7 +4,7 @@
 # include <stdlib.h>
 
 using namespace std;
-const int N=20;
+const int N=4;
 
 void iniciar(double u[N][N], double v[N][N], int N){
     for(int i=0; i<N; i++){
@@ -41,17 +41,22 @@ void Thomas(double x[N], double a[N], double b[N],double c[N], double d[N])
 
 void Sist_eq(double x[N], double a, double b, double d[N])
 {
-    double w;
+    double w,baux[N];
+    for(int i=0;i<N;i++){
+        baux[i]=b;
 
-    w=a/b;
-    b=b-w*a;
+    }
+
     for(int i=1; i<N; i++){
+        w=a/baux[i-1];
+        baux[i]=baux[i]-w*a;
         d[i]=d[i]-w*d[i-1];
+
     }
     
-    x[N-1]=d[N-1]/b;
+    x[N-1]=d[N-1]/baux[N-1];
     for(int i=N-2;i>-1;i--){
-        x[i]=(d[i]-a*x[i+1])/b;
+        x[i]=(d[i]-a*x[i+1])/baux[i];
     }
 }
 
@@ -167,7 +172,8 @@ int main()
         ADI(u,v,t,l,D,C1,C2);
     }
     escribir_datos(u,v,N);
+        return 0;
 
 
-    return 0;
+
 }
