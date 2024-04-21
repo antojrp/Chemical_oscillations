@@ -7,22 +7,27 @@ using namespace std;
 const int N=100;
 const int M=N-2;
 
-void iniciar(double u[N][N], double v[N][N], int N){
-    /*
-    for(int i=0; i<N; i++){
-        for(int j=0; j<N; j++){
-        u[i][j]=0;
-        v[i][j]=0;
+void iniciar(double u[N][N], double v[N][N], int N, string mode){
+    if(mode == "zeros")
+    {
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++)
+            {
+                u[i][j]=0;
+                v[i][j]=0;
+            }
         }
     }
-    */
-
-    for (int i = 0; i < N; ++i) 
+    
+    if(mode == "random")
     {
-        for (int j = 0; j < N; ++j) 
+        for (int i = 0; i < N; ++i) 
         {
-            u[i][j] = rand() / (double)(RAND_MAX + 1.0);
-            v[i][j] = rand() / (double)(RAND_MAX + 1.0);
+            for (int j = 0; j < N; ++j) 
+            {
+                u[i][j] = rand() / (double)(RAND_MAX + 1.0);
+                v[i][j] = rand() / (double)(RAND_MAX + 1.0);
+            }
         }
     }
 }
@@ -197,7 +202,8 @@ int main()
     double u[N][N],v[N][N];
     double t,l,D1,D2,C1,C2;
 
-    
+    // mode = "zeros", "random"
+    string mode = "zeros";
 
     t=0.01;
     l=0.01;
@@ -207,7 +213,7 @@ int main()
     C2=1;
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
-    iniciar(u,v,N);
+    iniciar(u,v,N,mode);
 
     for(int n=0;n<100;n++){
         escribir_datos(u,v,N);
