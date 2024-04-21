@@ -26,10 +26,26 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
             for (int j = 0; j < N; ++j) 
             {
                 u[i][j] = rand() / (double)(RAND_MAX + 1.0);
-                v[i][j] = rand() / (double)(RAND_MAX + 1.0);
+                v[i][j] = 0; // :)
             }
         }
+
+         for(int i=0;i<N;i++){
+            u[0][i]=0;
+            u[N-1][i]=0;
+            u[i][0]=0;
+            u[i][N-1]=0;
+
+            v[0][i]=0;
+            v[N-1][i]=0;
+            v[i][0]=0;
+            v[i][N-1]=0;
     }
+    }
+
+   
+
+    
 }
 
 void copiar(double a[N][N], double b[N][N], int N){
@@ -80,7 +96,6 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
 
     double x1[N][N],x2[N][N],y1[N][N],y2[N][N],a,b,d[N-2],aux[N-2];
 
-   
 
     //Calculo u_n+1
 
@@ -113,11 +128,10 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
         for(int j=1;j<N-1;j++){
             d[j-1]=C1*t-a*(x1[i+1][j]+x1[i-1][j])+(1+2*a)*x1[i][j]-t*(C2+1)*u[i][j]+t*pow(u[i][j],2)*v[i][j];
 
-
         }
         Sist_eq(aux,a,b,d);
         for(int j=1;j<N-1;j++){
-            x2[i][j]=aux[i-1];
+            x2[i][j]=aux[j-1];
         }
     }    
    
@@ -154,7 +168,7 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
         }
         Sist_eq(aux,a,b,d);
         for(int j=1;j<N-1;j++){
-            y2[i][j]=aux[i-1];
+            y2[i][j]=aux[j-1];
         }
     }
 
@@ -203,14 +217,14 @@ int main()
     double t,l,D1,D2,C1,C2;
 
     // mode = "zeros", "random"
-    string mode = "zeros";
+    string mode = "random";
 
     t=0.01;
     l=0.01;
     D1=1.0/4.0;
     D2=1.0/4.0;
-    C1=1;
-    C2=1;
+    C1=2;
+    C2=4;
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
