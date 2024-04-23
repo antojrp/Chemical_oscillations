@@ -169,7 +169,6 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
         }
     }
 
-
         copiar(u,x2,N);
         copiar(v,y2,N);
 
@@ -226,7 +225,7 @@ int main()
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
 
-    for(int n=0;n<100;n++){
+    for(int n=0;n<50;n++){
         escribir_datos(u,v,N);
         ADI(u,v,t,l,D1,D2,C1,C2);
     }

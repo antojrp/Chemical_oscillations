@@ -6,7 +6,7 @@ import io
 
 # Parameters
 file_out = "chemical_reactions"  # Output file name (without extension)
-interval = 500  # Time between frames in milliseconds
+interval = 200  # Time between frames in milliseconds
 save_to_file = True  # False: show the animation on screen, True: save to a file
 dpi = 150  # Output video quality (dots per inch)
 
@@ -29,13 +29,13 @@ frames_data_u = load_data("Chemical_oscillations_u.txt")
 frames_data_v = load_data("Chemical_oscillations_v.txt")
 
 # Create matrices for RGB color coding
-size = 4
 nframes = min(len(frames_data_u), len(frames_data_v))
 
 # Initialize the frames_data list
 frames_data = []
 
 # Create an array of zeros with the specified shape
+size = len(frames_data_u[0])
 zeros_array = np.zeros((size,size))
 
 # Iterate over each frame
