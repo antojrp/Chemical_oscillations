@@ -6,9 +6,9 @@ import io
 
 # Parameters
 file_out = "chemical_reactions"  # Output file name (without extension)
-interval = 200  # Time between frames in milliseconds
+interval = 10  # Time between frames in milliseconds
 save_to_file = True  # False: show the animation on screen, True: save to a file
-dpi = 150  # Output video quality (dots per inch)
+dpi = 300  # Output video quality (dots per inch)
 
 # Function to load data from a file
 def load_data(file_name):
@@ -49,7 +49,7 @@ maximo = np.max(frames_data)
 minimo = np.min(frames_data)
 
 # Normalize the image data to the range [0, 1]
-frames_data_normalized = [(frame_data - minimo) / (maximo - minimo) for frame_data in frames_data]
+frames_data_normalized = [(frame_data) / (maximo) for frame_data in frames_data]
 
 # Create the figure and axis objects
 fig, ax = plt.subplots()
@@ -69,6 +69,7 @@ animation = FuncAnimation(fig, update, fargs=(frames_data_normalized, im), frame
 # Save or show the animation
 if save_to_file:
     animation.save("{}.mp4".format(file_out), dpi=dpi)
+'''
 else:
     plt.show()
-
+'''

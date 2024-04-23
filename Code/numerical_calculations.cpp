@@ -4,8 +4,9 @@
 # include <stdlib.h>
 
 using namespace std;
-const int N=4;
+const int N=100;
 const int M=N-2;
+const double PI = 3.14159265358979323846264;
 
 void iniciar(double u[N][N], double v[N][N], int N, string mode){
     if(mode == "zeros")
@@ -18,6 +19,49 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
             }
         }
     }
+
+    if(mode == "centro")
+    {
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++)
+            {
+                u[i][j]=0;
+                v[i][j]=0;
+            }
+        }
+
+        for(int i=N/2 - 30; i<N/2 + 30; i++){
+            for(int j=N/2 - 30; j<N/2 + 30; j++)
+            {
+                u[i][j]=1;
+                v[i][j]=0;
+            }
+        }
+    }
+
+    if(mode == "mitad")
+    {
+        for(int i=0; i<N/2.0; i++){
+            for(int j=0; j<N; j++)
+            {
+                u[i][j]=1;
+                u[N-i-1][j]=0;
+                v[i][j]=0;
+                v[N-i-1][j]=1;
+            }
+        }
+    }
+
+    if(mode == "seno")
+    {
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++)
+            {
+                u[i][j]= pow(sin( ((i + j) * 2.0 * PI) / N), 2);
+                v[i][j]= pow(cos( ((i + j) * 2.0 * PI) / N), 2);
+            }
+        }
+    }
     
     if(mode == "random")
     {
@@ -26,11 +70,13 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
             for (int j = 0; j < N; ++j) 
             {
                 u[i][j] = rand() / (double)(RAND_MAX + 1.0);
-                v[i][j] = 0; // :)
+                v[i][j] = rand() / (double)(RAND_MAX + 1.0);
             }
         }
+    }
 
-         for(int i=0;i<N;i++){
+    for(int i=0;i<N;i++)
+    {
             u[0][i]=0;
             u[N-1][i]=0;
             u[i][0]=0;
@@ -40,7 +86,6 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
             v[N-1][i]=0;
             v[i][0]=0;
             v[i][N-1]=0;
-        }
     }
     
 }
@@ -212,20 +257,20 @@ int main()
     double u[N][N],v[N][N];
     double t,l,D1,D2,C1,C2;
 
-    // mode = "zeros", "random"
+    // mode = "zeros", "random", "centro", "mitad", "seno"
     string mode = "random";
 
-    t=0.01;
-    l=0.01;
-    D1=1.0/4.0;
-    D2=1.0/4.0;
-    C1=2;
-    C2=4;
+    t=0.001;
+    l=0.01  ;
+    D1=0.0/4.0;
+    D2=0.0/4.0; 
+    C1=30;
+    C2=C1 * pow(30, 0.5);
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
 
-    for(int n=0;n<50;n++){
+    for(int n=0;n<2000;n++){
         escribir_datos(u,v,N);
         ADI(u,v,t,l,D1,D2,C1,C2);
     }
