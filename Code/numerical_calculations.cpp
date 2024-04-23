@@ -4,7 +4,7 @@
 # include <stdlib.h>
 
 using namespace std;
-const int N=100;
+const int N=4;
 const int M=N-2;
 
 void iniciar(double u[N][N], double v[N][N], int N, string mode){
@@ -40,11 +40,8 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
             v[N-1][i]=0;
             v[i][0]=0;
             v[i][N-1]=0;
+        }
     }
-    }
-
-   
-
     
 }
 
@@ -234,8 +231,7 @@ int main()
         ADI(u,v,t,l,D1,D2,C1,C2);
     }
     escribir_datos(u,v,N);
-        return 0;
 
-
+    return 0;
 
 }
