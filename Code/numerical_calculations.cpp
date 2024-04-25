@@ -75,18 +75,6 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
         }
     }
 
-    for(int i=0;i<N;i++)
-    {
-            u[0][i]=0;
-            u[N-1][i]=0;
-            u[i][0]=0;
-            u[i][N-1]=0;
-
-            v[0][i]=0;
-            v[N-1][i]=0;
-            v[i][0]=0;
-            v[i][N-1]=0;
-    }
     
 }
 
@@ -98,40 +86,40 @@ void copiar(double a[N][N], double b[N][N], int N){
         }
 }
 
-void Thomas(double x[N], double a[N], double b[N],double c[N], double d[N])
-{
-    double w;
-
-    for(int i=1; i<N; i++){
-        w=a[i]/b[i-1];
-        b[i]=b[i]-w*c[i-1];
-        d[i]=d[i]-w*d[i-1];
-    }
+void cyclic_thomas(double x[N], double a, double b) {
     
-    x[N-1]=d[N-1]/b[N-1];
-    for(int i=N-2;i>-1;i--){
-        x[i]=(d[i]-c[i]*x[i+1])/b[i];
-    }
-}
+    double alpha = a;
+    double beta = a;
+    double cmod[N], u[N];
+    double gamma = -b;
+    double m;
+    double fact;
 
-void Sist_eq(double x[M], double a, double b, double d[M])
-{
-    double w,baux[M];
-    for(int i=0;i<M;i++){
-        baux[i]=b;
+    cmod[0] = alpha / (b - gamma);
+    u[0] = gamma / (b - gamma);
+    x[0] /= (b - gamma);
+
+
+    for (int i = 1; i + 1 < N; i++) {
+        m = 1.0 / (b - a * cmod[i - 1]);
+        cmod[i] = a * m;
+        u[i] = (0.0f  - a * u[i - 1]) * m;
+        x[i] = (x[i] - a * x[i - 1]) * m;
     }
 
-    for(int i=1; i<M; i++){
-        w=a/baux[i-1];
-        baux[i]=baux[i]-w*a;
-        d[i]=d[i]-w*d[i-1];
+    m = 1.0 / (b - alpha * beta / gamma - beta * cmod[N - 2]);
+    u[N - 1] = (alpha    - a * u[N - 2]) * m;
+    x[N - 1] = (x[N - 1] - a* x[N - 2]) * m;
 
+    for (int i = N - 2; i >= 0; i--) {
+        u[i] -= cmod[i] * u[i + 1];
+        x[i] -= cmod[i] * x[i + 1];
     }
-    
-    x[M-1]=d[M-1]/baux[M-1];
-    for(int i=M-2;i>-1;i--){
-        x[i]=(d[i]-a*x[i+1])/baux[i];
-    }
+
+    fact = (x[0] + x[N - 1] * beta / gamma) / (1.0 + u[0] + u[N - 1] * beta / gamma);
+
+    for (int i = 0; i < N; i++)
+        x[i] -= fact * u[i];
 }
 
 void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,double C1,double C2){
@@ -144,36 +132,24 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
     a=-D1*t/pow(l,2);
     b=(1-2*a);
 
+    for(int j=0;j<N;j++){
+        for(int i=0;i<N;i++){
+            d[i]=C1*t-a*(u[i][(j+1)%N]+u[i][(N+j-1)%N])+(1+2*a-t*(C2+1))*u[i][j]+t*pow(u[i][j],2)*v[i][j];
+        }
+        cyclic_thomas(d,a,b);
+        for(int i=0;i<N;i++){
+            x1[i][j]=d[i];
+        }
+    }
+
     for(int i=0;i<N;i++){
-        x1[0][i]=0;
-        x1[N-1][i]=0;
-        x1[i][0]=0;
-        x1[i][N-1]=0;
-
-        x2[0][i]=0;
-        x2[N-1][i]=0;
-        x2[i][0]=0;
-        x2[i][N-1]=0;
-    }
-
-    for(int j=1;j<N-1;j++){
-        for(int i=1;i<N-1;i++){
-            d[i-1]=C1*t-a*(u[i][j+1]+u[i][j-1])+(1+2*a-t*(C2+1))*u[i][j]+t*pow(u[i][j],2)*v[i][j];
-        }
-        Sist_eq(aux,a,b,d);
-        for(int i=1;i<N-1;i++){
-            x1[i][j]=aux[i-1];
-        }
-    }
-
-    for(int i=1;i<N-1;i++){
-        for(int j=1;j<N-1;j++){
-            d[j-1]=C1*t-a*(x1[i+1][j]+x1[i-1][j])+(1+2*a)*x1[i][j]-t*(C2+1)*u[i][j]+t*pow(u[i][j],2)*v[i][j];
+        for(int j=0;j<N;j++){
+            d[j]=C1*t-a*(x1[(i+1)%N][j]+x1[(N+i-1)%N][j])+(1+2*a)*x1[i][j]-t*(C2+1)*u[i][j]+t*pow(u[i][j],2)*v[i][j];
 
         }
-        Sist_eq(aux,a,b,d);
-        for(int j=1;j<N-1;j++){
-            x2[i][j]=aux[j-1];
+        cyclic_thomas(d,a,b);
+        for(int j=0;j<N;j++){
+            x2[i][j]=d[j];
         }
     }    
    
@@ -182,35 +158,24 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
     a=-D2*t/pow(l,2);
     b=(1-2*a);
 
+
+    for(int j=0;j<N;j++){
+        for(int i=0;i<N;i++){
+            d[i]=-a*(v[i][(j+1)%N]+v[i][(N+j-1)%N])+(1+2*a)*v[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
+        }
+        cyclic_thomas(d,a,b);
+        for(int i=0;i<N;i++){
+            y1[i][j]=d[i];
+        }
+    }
+
     for(int i=0;i<N;i++){
-        y1[0][i]=0;
-        y1[N-1][i]=0;
-        y1[i][0]=0;
-        y1[i][N-1]=0;
-
-        y2[0][i]=0;
-        y2[N-1][i]=0;
-        y2[i][0]=0;
-        y2[i][N-1]=0;
-    }
-
-    for(int j=1;j<N-1;j++){
-        for(int i=1;i<N-1;i++){
-            d[i-1]=-a*(v[i][j+1]+v[i][j-1])+(1+2*a)*v[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
+        for(int j=0;j<N;j++){
+            d[j-1]=-a*(y1[(i+1)%N][j]+y1[(N+i-1)%N][j])+(1+2*a)*y1[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
         }
-        Sist_eq(aux,a,b,d);
-        for(int i=1;i<N-1;i++){
-            y1[i][j]=aux[i-1];
-        }
-    }
-
-    for(int i=1;i<N-1;i++){
-        for(int j=1;j<N-1;j++){
-            d[j-1]=-a*(y1[i+1][j]+y1[i-1][j])+(1+2*a)*y1[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
-        }
-        Sist_eq(aux,a,b,d);
-        for(int j=1;j<N-1;j++){
-            y2[i][j]=aux[j-1];
+        cyclic_thomas(d,a,b);
+        for(int j=0;j<N;j++){
+            y2[i][j]=d[j];
         }
     }
 
@@ -270,7 +235,7 @@ int main()
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
 
-    for(int n=0;n<2000;n++){
+    for(int n=0;n<500;n++){
         escribir_datos(u,v,N);
         ADI(u,v,t,l,D1,D2,C1,C2);
     }
