@@ -69,7 +69,7 @@ animation = FuncAnimation(fig, update, fargs=(frames_data_normalized, im), frame
 # Save or show the animation
 if save_to_file:
     animation.save("{}.mp4".format(file_out), dpi=dpi)
-'''
+
 else:
     plt.show()
-'''
+

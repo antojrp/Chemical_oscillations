@@ -97,7 +97,7 @@ void cyclic_thomas(double x[N], double a, double b) {
 
     cmod[0] = alpha / (b - gamma);
     u[0] = gamma / (b - gamma);
-    x[0] /= (b - gamma);
+    x[0] = x[0] / (b - gamma);
 
 
     for (int i = 1; i + 1 < N; i++) {
@@ -118,13 +118,14 @@ void cyclic_thomas(double x[N], double a, double b) {
 
     fact = (x[0] + x[N - 1] * beta / gamma) / (1.0 + u[0] + u[N - 1] * beta / gamma);
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < N; i++){
         x[i] -= fact * u[i];
+    }
 }
 
 void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,double C1,double C2){
 
-    double x1[N][N],x2[N][N],y1[N][N],y2[N][N],a,b,d[N-2],aux[N-2];
+    double x1[N][N],x2[N][N],y1[N][N],y2[N][N],a,b,d[N];
 
 
     //Calculo u_n+1
@@ -162,6 +163,7 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
     for(int j=0;j<N;j++){
         for(int i=0;i<N;i++){
             d[i]=-a*(v[i][(j+1)%N]+v[i][(N+j-1)%N])+(1+2*a)*v[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
+
         }
         cyclic_thomas(d,a,b);
         for(int i=0;i<N;i++){
@@ -171,7 +173,7 @@ void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,do
 
     for(int i=0;i<N;i++){
         for(int j=0;j<N;j++){
-            d[j-1]=-a*(y1[(i+1)%N][j]+y1[(N+i-1)%N][j])+(1+2*a)*y1[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
+            d[j]=-a*(y1[(i+1)%N][j]+y1[(N+i-1)%N][j])+(1+2*a)*y1[i][j]+t*C2*u[i][j]-t*pow(u[i][j],2)*v[i][j];
         }
         cyclic_thomas(d,a,b);
         for(int j=0;j<N;j++){
@@ -221,21 +223,22 @@ int main()
 {
     double u[N][N],v[N][N];
     double t,l,D1,D2,C1,C2;
+    double x[N]={1,2,3,4},a=3,b=4;
 
     // mode = "zeros", "random", "centro", "mitad", "seno"
-    string mode = "random";
+    string mode = "centro";
 
     t=0.001;
     l=0.01  ;
-    D1=0.0/4.0;
-    D2=0.0/4.0; 
-    C1=30;
-    C2=C1 * pow(30, 0.5);
+    D1=0.1/4.0;
+    D2=0.1/4.0; 
+    C1=0.2;
+    C2=0.6;
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
 
-    for(int n=0;n<500;n++){
+    for(int n=0;n<20;n++){
         escribir_datos(u,v,N);
         ADI(u,v,t,l,D1,D2,C1,C2);
     }
