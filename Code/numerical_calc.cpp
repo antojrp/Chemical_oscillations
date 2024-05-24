@@ -1,7 +1,9 @@
 #include <math.h>
 #include <iostream>
-# include <fstream>
-# include <stdlib.h>
+#include <fstream>
+#include <stdlib.h>
+#include <ctime>
+#include <time.h>
 
 using namespace std;
 const int N=100;
@@ -11,7 +13,7 @@ const double PI = 3.14159265358979323846264;
 void iniciar(double u[N][N], double v[N][N], int N, string mode){
     if(mode == "zeros")
     {
-        for(int i=0; i<N; i++){
+        for(int i=0; i<N; i++){     
             for(int j=0; j<N; j++)
             {
                 u[i][j]=0;
@@ -53,6 +55,14 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
             for(int  j=N/4; j<N; j++)
             {
                 u[i][j]=0;
+                v[i][j]=1;
+            }
+        }
+
+        for(int i=3*N/4; i<N; i++){
+            for(int  j=3*N/4; j<N; j++)
+            {
+                u[i][j]=1;
                 v[i][j]=0;
             }
         }
@@ -82,14 +92,15 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
         }
     }
     
-    if(mode == "random")
+    if (mode == "random")
     {
+        srand(time(NULL));  // Initialize the random seed with the current time
         for (int i = 0; i < N; ++i) 
         {
             for (int j = 0; j < N; ++j) 
             {
-                u[i][j] = rand() / (double)(RAND_MAX + 1.0);
-                v[i][j] = rand() / (double)(RAND_MAX + 1.0);
+                u[i][j] = 1.0 * rand() / (double)RAND_MAX;
+                v[i][j] = 1.0 * rand() / (double)RAND_MAX;
             }
         }
     }
@@ -220,13 +231,13 @@ void comparativa_rgb(double u[][N], double v[][N], double p_u[][N], double p_v[]
         {
             if(u[i][j] - v[i][j] >= 0)
             {
-                p_u[i][j] = (u[i][j] - v[i][j]) + 0.3;
-                p_v[i][j] = 0.35; // (u[i][j] - v[i][j]);
+                p_u[i][j] = (u[i][j] - v[i][j])*(1);
+                p_v[i][j] = 0; // (u[i][j] - v[i][j]);
             }
             else
             {
-                p_v[i][j] = (v[i][j] - u[i][j]) + 0.3;
-                p_u[i][j] = 0.35; // (v[i][j] - u[i][j]);
+                p_v[i][j] = (v[i][j] - u[i][j])*(1);
+                p_u[i][j] = 0; // (v[i][j] - u[i][j]);
             }
         }
     }
@@ -261,31 +272,44 @@ void escribir_datos(double u[][N],double v[][N], int N)
 int main()
 {
     double u[N][N],v[N][N], p_u[N][N],p_v[N][N];
-    double t,l,D1,D2,C1,C2;
+    double t,l,D1,D2,C1,C2,t0,t1,eta,iteraciones,n;
 
     // mode = "zeros", "random", "centro", "mitad", "seno", "esquina"
     string mode = "random";
 
-    t=0.0001;
-    l=0.01;
-    D1=0.1/4.0;
-    D2=0.1/4.0; 
-    C1=0.6;
-    C2=0.2;
+    t0=clock();
+
+    iteraciones = 10000;
+
+    n = 100.0;
+
+    t=pow(10.0, -6);
+    l=pow(10.0, -2);
+    D1=1.0/n;
+    D2=1.0/n;
+    C1=4.0; // rojo
+    C2=6.0; // azul
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
 
-    for(int n=0;n<2000;n++){
-        if( (n%10) == 0)
+    for(int n=0;n<iteraciones;n++){
+        if( n%40 == 0)
             {
-            comparativa_rgb(u,v,p_u,p_v);
-            escribir_datos(p_u,p_v,N);
+            // comparativa_rgb(u,v,p_u,p_v);
+            // escribir_datos(p_u,p_v,N);
+            escribir_datos(u,v,N);
             }
         ADI(u,v,t,l,D1,D2,C1,C2);
     }
-    comparativa_rgb(u,v,p_u,p_v);
-    escribir_datos(p_u,p_v,N);;
+    // comparativa_rgb(u,v,p_u,p_v);
+    // escribir_datos(p_u,p_v,N);;
+    escribir_datos(u,v,N);;
+
+    t1=clock();
+
+    cout << "El programa ha hecho " << iteraciones << " iteraciones para una red " << N << "x" << N << endl;
+    cout << "El programa ha tardado " << (t1-t0) / CLOCKS_PER_SEC << " segundos" << endl;
 
     return 0;
 
