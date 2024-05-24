@@ -99,7 +99,7 @@ elif mode == "cmap":
     fig, ax = plt.subplots()
     ax.axis("off")  # Do not show the axes
         
-    im = ax.imshow(f_u[0], cmap='seismic')
+    im = ax.imshow(f_u[0], cmap='RdYlBu')
     
     # Function to update the animation
     def update(j_frame, f_u, im):

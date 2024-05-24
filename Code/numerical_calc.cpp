@@ -6,7 +6,7 @@
 #include <time.h>
 
 using namespace std;
-const int N=100;
+const int N=150;
 const int M=N-2;
 const double PI = 3.14159265358979323846264;
 
@@ -272,35 +272,45 @@ void escribir_datos(double u[][N],double v[][N], int N)
 int main()
 {
     double u[N][N],v[N][N], p_u[N][N],p_v[N][N];
-    double t,l,D1,D2,C1,C2,t0,t1,eta,iteraciones,n;
+    double t,l,D1,D2,a,b,t0,t1,iteraciones,eta;
 
     // mode = "zeros", "random", "centro", "mitad", "seno", "esquina"
     string mode = "random";
 
     t0=clock();
 
-    iteraciones = 10000;
+    iteraciones = 100000;
 
-    n = 100.0;
+    t=0.8*pow(10.0, -3);
 
-    t=pow(10.0, -6);
-    l=pow(10.0, -2);
-    D1=1.0/n;
-    D2=1.0/n;
-    C1=4.0; // rojo
-    C2=6.0; // azul
+    D1=5.0;
+    D2=40.0;
+    eta = pow(D1 / D2, 0.5);
+    a=5.0; // rojo
+    b=13.02290764; // azul
+
+    l = 8 * (5.0 * a * eta + 7*pow(a*eta, 2) - 3 - 3*pow(a*eta, 3) ) / (pow(a,3)* eta * (1 + a *eta));
+
+    cout << "The value of l is: " << l << endl;
+    
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
     iniciar(u,v,N,mode);
 
+    cout << "Progress: " << endl;
+    cout << "░░░░░░░░░░" << endl;
     for(int n=0;n<iteraciones;n++){
-        if( n%40 == 0)
+        if( n%400 == 0)
             {
             // comparativa_rgb(u,v,p_u,p_v);
             // escribir_datos(p_u,p_v,N);
             escribir_datos(u,v,N);
             }
-        ADI(u,v,t,l,D1,D2,C1,C2);
+        if (( n % 10000 == 0 ) && ( n != 0))
+            {
+                cout << "▐";
+            }
+        ADI(u,v,t,l,D1,D2,a,b);
     }
     // comparativa_rgb(u,v,p_u,p_v);
     // escribir_datos(p_u,p_v,N);;
