@@ -11,8 +11,8 @@ import numpy as np
 a=2
 b=1
 q=0
-d1=1
-d2=1
+d1=5
+d2=40
 
 def traza(a,b,q,d1,d2):
     return b-1-a**2-(d1+d2)*q**2

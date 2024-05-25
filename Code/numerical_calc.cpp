@@ -272,7 +272,7 @@ void escribir_datos(double u[][N],double v[][N], int N)
 int main()
 {
     double u[N][N],v[N][N], p_u[N][N],p_v[N][N];
-    double t,l,D1,D2,a,b,t0,t1,iteraciones,eta;
+    double t,l,D1,D2,a,b,t0,t1,iteraciones,eta,bc,mu;
 
     // mode = "zeros", "random", "centro", "mitad", "seno", "esquina"
     string mode = "random";
@@ -287,11 +287,13 @@ int main()
     D2=40.0;
     eta = pow(D1 / D2, 0.5);
     a=5.0; // rojo
-    b=13.02290764; // azul
+    bc=pow(1+eta*a,2);
+    mu=2.1;
+    b=bc*mu+bc; // azul
 
     l = 8 * (5.0 * a * eta + 7*pow(a*eta, 2) - 3 - 3*pow(a*eta, 3) ) / (pow(a,3)* eta * (1 + a *eta));
 
-    cout << "The value of l is: " << l << endl;
+    cout << "The value of l is: " << b << endl;
     
     crear_fichero("Chemical_oscillations_u.txt");
     crear_fichero("Chemical_oscillations_v.txt");
