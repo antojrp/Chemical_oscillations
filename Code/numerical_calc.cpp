@@ -6,11 +6,11 @@
 #include <time.h>
 
 using namespace std;
-const int N=150;
+const int N=250;
 const int M=N-2;
-const double PI = 3.14159265358979323846264;
+const float PI = 3.14159265358979323846264;
 
-void iniciar(double u[N][N], double v[N][N], int N, string mode){
+void iniciar(float u[N][N], float v[N][N], int N, string mode){
     if(mode == "zeros")
     {
         for(int i=0; i<N; i++){     
@@ -99,8 +99,8 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
         {
             for (int j = 0; j < N; ++j) 
             {
-                u[i][j] = 1.0 * rand() / (double)RAND_MAX;
-                v[i][j] = 1.0 * rand() / (double)RAND_MAX;
+                u[i][j] = 1.0 * rand() / (float)RAND_MAX;
+                v[i][j] = 1.0 * rand() / (float)RAND_MAX;
             }
         }
     }
@@ -108,7 +108,7 @@ void iniciar(double u[N][N], double v[N][N], int N, string mode){
     
 }
 
-void copiar(double a[N][N], double b[N][N], int N){
+void copiar(float a[N][N], float b[N][N], int N){
     for(int i=0; i<N; i++){
             for(int j=0; j<N; j++){
             a[i][j]=b[i][j];
@@ -116,14 +116,14 @@ void copiar(double a[N][N], double b[N][N], int N){
         }
 }
 
-void cyclic_thomas(double x[N], double a, double b) {
+void cyclic_thomas(float x[N], float a, float b) {
     
-    double alpha = a;
-    double beta = a;
-    double cmod[N], u[N];
-    double gamma = -b;
-    double m;
-    double fact;
+    float alpha = a;
+    float beta = a;
+    float cmod[N], u[N];
+    float gamma = -b;
+    float m;
+    float fact;
 
     cmod[0] = alpha / (b - gamma);
     u[0] = gamma / (b - gamma);
@@ -153,9 +153,9 @@ void cyclic_thomas(double x[N], double a, double b) {
     }
 }
 
-void ADI(double u[N][N], double v[N][N],double t,double l,double D1,double D2,double C1,double C2){
+void ADI(float u[N][N], float v[N][N],float t,float l,float D1,float D2,float C1,float C2){
 
-    double x1[N][N],x2[N][N],y1[N][N],y2[N][N],a,b,d[N];
+    float x1[N][N],x2[N][N],y1[N][N],y2[N][N],a,b,d[N];
 
 
     //Calculo u_n+1
@@ -223,7 +223,7 @@ void crear_fichero(string nombre)
     salida.close();
 }
 
-void comparativa_rgb(double u[][N], double v[][N], double p_u[][N], double p_v[][N])
+void comparativa_rgb(float u[][N], float v[][N], float p_u[][N], float p_v[][N])
 {
     for(int i=0; i<N; i++)
     {
@@ -243,9 +243,9 @@ void comparativa_rgb(double u[][N], double v[][N], double p_u[][N], double p_v[]
     }
 }
 
-void escribir_datos(double u[][N],double v[][N], int N)
+void escribir_datos(float u[][N],float v[][N], int N, int i)
 {
-    ofstream salida1("Chemical_oscillations_u.txt", ios::app), salida2("Chemical_oscillations_v.txt", ios::app);
+    ofstream salida1("Chemical_oscillations_u"+to_string(i)+".txt", ios::app), salida2("Chemical_oscillations_v"+to_string(i)+".txt", ios::app);
     for(int i=0; i<N; i++)
     {
         for(int j=0; j<N-1; j++)
@@ -271,57 +271,59 @@ void escribir_datos(double u[][N],double v[][N], int N)
 
 int main()
 {
-    double u[N][N],v[N][N], p_u[N][N],p_v[N][N];
-    double t,l,D1,D2,a,b,t0,t1,iteraciones,eta,bc,mu;
+    float u[N][N],v[N][N], p_u[N][N],p_v[N][N];
+    float t,l,D1,D2,a,b,t0,t1,iteraciones,eta,bc,mu;
 
     // mode = "zeros", "random", "centro", "mitad", "seno", "esquina"
-    string mode = "random";
 
-    t0=clock();
+    for(int i=5; i<7;i++){
+        string mode = "random";
 
-    iteraciones = 100000;
+        t0=clock();
 
-    t=0.8*pow(10.0, -3);
+        iteraciones = 100000;
 
-    D1=5.0;
-    D2=40.0;
-    eta = pow(D1 / D2, 0.5);
-    a=5.0; // rojo
-    bc=pow(1+eta*a,2);
-    mu=2.1;
-    b=bc*mu+bc; // azul
+        t=0.8*pow(10.0, -3);
 
-    l = 8 * (5.0 * a * eta + 7*pow(a*eta, 2) - 3 - 3*pow(a*eta, 3) ) / (pow(a,3)* eta * (1 + a *eta));
+        D1=5.0;
+        D2=40.0;
+        eta = pow(D1 / D2, 0.5);
+        a=5.0; // rojo
+        bc=pow(1+eta*a,2);
+        mu=-0.5+i/2.0;
+        b=bc*mu+bc; // azul
 
-    cout << "The value of l is: " << b << endl;
-    
-    crear_fichero("Chemical_oscillations_u.txt");
-    crear_fichero("Chemical_oscillations_v.txt");
-    iniciar(u,v,N,mode);
+        l = 3.5 * (5.0 * a * eta + 7*pow(a*eta, 2) - 3 - 3*pow(a*eta, 3) ) / (pow(a,3)* eta * (1 + a *eta));
 
-    cout << "Progress: " << endl;
-    cout << "░░░░░░░░░░" << endl;
-    for(int n=0;n<iteraciones;n++){
-        if( n%400 == 0)
-            {
-            // comparativa_rgb(u,v,p_u,p_v);
-            // escribir_datos(p_u,p_v,N);
-            escribir_datos(u,v,N);
-            }
-        if (( n % 10000 == 0 ) && ( n != 0))
-            {
-                cout << "▐";
-            }
-        ADI(u,v,t,l,D1,D2,a,b);
+        cout << "The value of i is: " << i << endl;
+        cout << "The value of mu is: " << mu << endl;
+        
+        crear_fichero("Chemical_oscillations_u"+to_string(i)+".txt");
+        crear_fichero("Chemical_oscillations_v"+to_string(i)+".txt");
+        iniciar(u,v,N,mode);
+
+        cout << "Progress: " << endl;
+        cout << "░░░░░░░░░░" << endl;
+        for(int n=0;n<iteraciones;n++){
+            if( n%400 == 0)
+                {
+                escribir_datos(u,v,N,i);
+                }
+            if (( n % 10000 == 0 ) && ( n != 0))
+                {
+                    cout << "▐";
+                }
+            ADI(u,v,t,l,D1,D2,a,b);
+        }
+        escribir_datos(u,v,N,i);;
+
+        t1=clock();
+
+        cout << "El programa ha hecho " << iteraciones << " iteraciones para una red " << N << "x" << N << endl;
+        cout << "El programa ha tardado " << (t1-t0) / CLOCKS_PER_SEC << " segundos" << endl;
+
     }
-    // comparativa_rgb(u,v,p_u,p_v);
-    // escribir_datos(p_u,p_v,N);;
-    escribir_datos(u,v,N);;
-
-    t1=clock();
-
-    cout << "El programa ha hecho " << iteraciones << " iteraciones para una red " << N << "x" << N << endl;
-    cout << "El programa ha tardado " << (t1-t0) / CLOCKS_PER_SEC << " segundos" << endl;
+    
 
     return 0;
 
